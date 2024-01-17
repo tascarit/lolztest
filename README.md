@@ -9,8 +9,8 @@
 
 В командной строке нужно написать следующее:
 
-`cd Downloads/lolztest-main/
-g++ main.cpp -o main.exe`
+`cd Downloads/lolztest-main/`
+`g++ main.cpp -o main.exe`
 
 После чего у вас в архиве появится файл **main.exe**, ура!
 Можете запускать и наслаждаться прочтениям названий книг!

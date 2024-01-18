@@ -8,11 +8,11 @@ using namespace std;
 int main();
 vector<vector<string>> LoadDB(); // Тут я определяю две функции чтобы использовать их потом в тех что стоят выше их обьявлений
 
-vector<string> split(const string &str) { // Функция разделения строки на слова (разделение по пробелу) и возвращающая вектор этих слов
+vector<string> split(const string &str) { // Функция разделения строки на слова (разделение по пробелу и нижнему подчеркиванию) и возвращающая вектор этих слов
     vector<string> vec;
     string s;
     for (const char i: str) {
-        if (i!='_')
+        if (i!='_' && i!=' ')
             s+=i;
         else {
             vec.push_back(s);
@@ -23,12 +23,20 @@ vector<string> split(const string &str) { // Функция разделения
     return vec;
 }
 
+void PrintBookByChoice(const int &choice, const vector<vector<string>> &books){
+    system("clear");
+    string check;
+    cout<<"Name: "<<books[choice-1][0]<<"\nAuthor: "<<books[choice-1][1]<<"\nGenre: "<<books[choice-1][2]<<"\nDescription: "<<books[choice-1][3]<<"\n\n";
+    cout<<"Go back? (any char there) > ";
+    getline(cin, check);
+}
+
 void AddGenre(const string &filename) { // Функция добавления жанра которая записывает жанр в файл genre.txt
-    system("cls");
+    system("clear");
     ofstream os(filename, ios::app);
     string genre;
     cout<<"Enter a genre > ";
-    cin>>genre;
+    getline(cin, genre);
     os<<genre+'.';
     os.close();
 }
@@ -54,40 +62,36 @@ vector<string> LoadGenres(const string &filename) { // Функция загру
 }
 
 void GenreBooksList(const vector<string> &genres) { // Функция выводящая список книг по жанрам принимающая в аргументах неизменяемый вектор строк содержащий жанры, эта функция у меня выводит пронумерованый список жанров а в дальнейшем после выбора жанра выводит все книги этого жанра
-    system("cls");
+    system("clear");
     int i=1;
     for (const string &genre: genres) {
         cout<<i<<") "+genre+"\n";
         i++;
     }
 
-    int choice;
+    string choice;
     cout<<"Your choice > ";
-    cin>>choice;
+    getline(cin, choice);
 
     const vector<vector<string>> books = LoadDB();
     int j=1;
     for (auto & book : books) {
-        if (book[2]==genres[choice-1]) {
+        if (book[2]==genres[stoi(choice)-1]) {
             cout<<j<<"\nName: "<<book[0]<<"\nAuthor: "<<book[1]<<"\n\n";
             j+=1;
         }
     }
 
     cout<<"Your choice (0 to exit) > ";
-    cin>>choice;
+    getline(cin, choice);
 
-    if(choice!=0) {
-        system("cls");
-        string check;
-        cout<<"Name: "<<books[choice-1][0]<<"\nAuthor: "<<books[choice-1][1]<<"\nGenre: "<<books[choice-1][2]<<"\nDescription: "<<books[choice-1][3]<<"\n\n";
-        cout<<"Go back? (any char there) > ";
-        cin>>check;
+    if(choice!="0") {
+        PrintBookByChoice(stoi(choice), books);
     }
 }
 
 void Search(const string &keyword) { // Функция поиска по ключевому слову, в качестве аргумента идет константа (ключевое слово), после чего функция загружает список книг из базы и потом разделяет поля название и автор по пробелам и проверяет на наличие ключевого слова в них после чего добавляет айдишники найденных книг в вектор, который в последствии сортирует и удаляет дубликаты, после чего выводит книги с этими айдишниками
-    system("cls");
+    system("clear");
 
     const vector<vector<string>> books = LoadDB();
     vector<int> bookIDs;
@@ -106,15 +110,11 @@ void Search(const string &keyword) { // Функция поиска по клю�
     for (const int id: bookIDs) {
         cout<<"ID: "<<id<<"\nName: "<<books[id][0]<<"\nAuthor: "<<books[id][1]<<"\nGenre: "<<books[id][2]<<"Description: "<<books[id][3]<<"\n\n";
     }
-    int choice;
+    string choice;
     cout<<"Your choice (0 to exit) > ";
-    cin>>choice;
-    if(choice!=0) {
-        system("cls");
-        string check;
-        cout<<"Name: "<<books[choice-1][0]<<"\nAuthor: "<<books[choice-1][1]<<"\nGenre: "<<books[choice-1][2]<<"\nDescription: "<<books[choice-1][3]<<"\n\n";
-        cout<<"Go back (any char there) > ";
-        cin>>check;
+    getline(cin, choice);
+    if(choice!="0") {
+        PrintBookByChoice(stoi(choice), books);
     }
 }
 
@@ -158,37 +158,38 @@ void DeleteBook(const int &ID, const string &filename){ // Функция уда
 }
 
 void AddBook(const string &filename) { // Функция добавления книги, открывает файл на запись и записывает туда книгу с ввода из клавиатуры
-    system("cls");
+    system("clear");
     ofstream os(filename, ios::app);
     string tempBook;
-    cout<<"Enter a name.author.genre.description. there > ";
-    cin>>tempBook;
-    os<<tempBook+"\n";
+    vector<string> questions = {"Enter a name > ", "Enter an author > ", "Enter a genre > ", "Enter a description > "};
+    for (const auto & question : questions){
+        cout<<'\n'<<question;
+        getline(cin, tempBook);
+        os<<tempBook<<".";
+        tempBook="";
+    }
+    os<<'\n';
     os.close();
 }
 
 void BooksList(const vector<vector<string>> &books) { // Функция вывода книг на экран (вообще всех) после чего можно открыть книгу и посмотреть жанр и описание
-    system("cls");
-    int choice;
+    system("clear");
+    string choice;
     cout<<"Books list\n\n";
     for (int i=0;i<books.size();i++) {
         cout<<to_string(i+1)<<"\nName: "<<books[i][0]<<"\nAuthor: "<<books[i][1]<<"\nID: "<<i<<"\n\n";
     }
     cout<<"Your choice (0 to exit) > ";
-    cin>>choice;
-    if(choice!=0) {
-        system("cls");
-        string check;
-        cout<<"Name: "<<books[choice-1][0]<<"\nAuthor: "<<books[choice-1][1]<<"\nGenre: "<<books[choice-1][2]<<"\nDescription: "<<books[choice-1][3]<<"\n\n";
-        cout<<"Go back (any char there) > ";
-        cin>>check;
+    getline(cin, choice);
+    if(choice!="0") {
+        PrintBookByChoice(stoi(choice), books);
     }
 }
 
 int main() { // Главная функция которая предлагает нам различные действия которые можно сделать с базой книг, и обрабатывает наш выбор в конструкции switch-case, а если там не нашлось значения для обработки или значение не верно то просто функция перезапускается
     while (true) {
-        system("cls");
-        int choice;
+        system("clear");
+        string choice;
 
         cout<<"Books catalog\n\n"
         "1) Books list\n"
@@ -198,9 +199,9 @@ int main() { // Главная функция которая предлагае�
         "5) Search a book by keyword\n"
         "6) Delete\n\n";
         cout<<"Your choice (0 to exit) > ";
-        cin>>choice;
+        getline(cin, choice);
 
-        switch (choice) {
+        switch (stoi(choice)) {
             case 0: {
                 exit(0);
                 continue;
@@ -226,15 +227,15 @@ int main() { // Главная функция которая предлагае�
             case 5: {
                 string keyword;
                 cout<<"Enter a keyword > ";
-                cin>>keyword;
+                getline(cin, keyword);
                 Search(keyword);
                 continue;
             }
             case 6: {
-                int ID;
+                string ID;
                 cout<<"Enter a book ID > ";
-                cin>>ID;
-                DeleteBook(ID, "booksDB.txt");
+                getline(cin, ID);
+                DeleteBook(stoi(ID), "booksDB.txt");
             }
             default:
                 continue;
